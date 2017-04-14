@@ -15,15 +15,15 @@ import {
 } from 'react-native';
 
 var background = [ 
-             ['#87CEFA','#87CEFA','#87CEFA','white','white','white','#87CEFA','#87CEFA','#87CEFA'],
-             ['#87CEFA','#87CEFA','#87CEFA','white','white','white','#87CEFA','#87CEFA','#87CEFA'],
-             ['#87CEFA','#87CEFA','#87CEFA','white','white','white','#87CEFA','#87CEFA','#87CEFA'], 
-             ['white','white','white','#87CEFA','#87CEFA','#87CEFA','white','white','white'],
-             ['white','white','white','#87CEFA','#87CEFA','#87CEFA','white','white','white'],
-             ['white','white','white','#87CEFA','#87CEFA','#87CEFA','white','white','white'],
-             ['#87CEFA','#87CEFA','#87CEFA','white','white','white','#87CEFA','#87CEFA','#87CEFA'],
-             ['#87CEFA','#87CEFA','#87CEFA','white','white','white','#87CEFA','#87CEFA','#87CEFA'],
-             ['#87CEFA','#87CEFA','#87CEFA','white','white','white','#87CEFA','#87CEFA','#87CEFA'] 
+             ['#00b0ff','#00b0ff','#00b0ff','white','white','white','#00b0ff','#00b0ff','#00b0ff'],
+             ['#00b0ff','#00b0ff','#00b0ff','white','white','white','#00b0ff','#00b0ff','#00b0ff'],
+             ['#00b0ff','#00b0ff','#00b0ff','white','white','white','#00b0ff','#00b0ff','#00b0ff'], 
+             ['white','white','white','#00b0ff','#00b0ff','#00b0ff','white','white','white'],
+             ['white','white','white','#00b0ff','#00b0ff','#00b0ff','white','white','white'],
+             ['white','white','white','#00b0ff','#00b0ff','#00b0ff','white','white','white'],
+             ['#00b0ff','#00b0ff','#00b0ff','white','white','white','#00b0ff','#00b0ff','#00b0ff'],
+             ['#00b0ff','#00b0ff','#00b0ff','white','white','white','#00b0ff','#00b0ff','#00b0ff'],
+             ['#00b0ff','#00b0ff','#00b0ff','white','white','white','#00b0ff','#00b0ff','#00b0ff'] 
           ]
 
 var {height, width} = Dimensions.get('window');
@@ -35,7 +35,7 @@ export default class Item extends Component {
   }
   componentWillMount(){
       if(this.props.value[this.props.index.i][this.props.index.j][0] != null){
-          this.setState({touchable:false})
+        //   this.setState({touchable:false})
       }
       this.setState({value:(this.props.value)})
   }

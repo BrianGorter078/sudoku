@@ -9,20 +9,15 @@ export default class sidebar extends Component {
         this.onPress = this.onPress.bind(this)
     }
     onPress(){
-        console.log("onpereee")
-        this.props.restart()
+
     }
 
     render() {
         return (
             <Container style={{backgroundColor:"#ffffff"}}>
-                
-                  <Content style={{marginTop:20}}>
-                    <View style={{flex:1, marginLeft:10, marginRight:10}}>
-                    <Image source={image}/>
-                    </View>
+                <Content> 
                     <ListItem>
-                        <TouchableWithoutFeedback onPress={this.onPress}><Text>Restart Game</Text></TouchableWithoutFeedback>
+                        <Text>More coming soon!</Text>
                     </ListItem>
                 </Content>
             </Container>

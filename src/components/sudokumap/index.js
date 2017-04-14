@@ -12,15 +12,20 @@ import {
   View,
   Dimensions,
   TouchableWithoutFeedback,
-  Alert,
-  Button
+  Alert
 } from 'react-native';
+import {Spinner, StyleProvider, Drawer, Container, Header, Left, Icon, Body,Title,Right, Button} from 'native-base'
+import getTheme from '../../../native-base-theme';
+import variables from '../../../native-base-theme/variables';
+import Sidebar from '../sidebar/index';
 import Item from './item'
 import Input from './input'
 import Timer from '../timer/index'
 import Sudoku from 'sudoku'
 
+var inputcolumns = [1,2,3,4,5]
 var columns = [1,2,3,4,5,6,7,8,9];
+var inputs = [[1,2,3,4,5],[6,7,8,9,'C']]
 
 var {height, width} = Dimensions.get('window');
 
@@ -31,29 +36,33 @@ const flatten = arr => arr.reduce(
   []
 );
 
+
 export default class sudokumap extends Component {
   constructor(props){
     super(props)
-    this.state = {selected : null, sudoku:[], input: null, solved: false, result: [], steps:0, restart:false, done: false}
+    this.state = {selected : null, sudoku:[], input: null, solved: false, result: [], steps:0, done: false, restart:false}
     this.selected = this.selected.bind(this)
     this.input = this.input.bind(this)
     this.rerenderBoard = this.rerenderBoard.bind(this)
+    this.timeWhenFinished = this.timeWhenFinished.bind(this)
   }
   componentWillMount(){
-    this.setState({restart:this.props.restart})
     this.getSudokuBoard()
   }
   rerenderBoard(){
-     this.setState({solved:false, sudoku:[], restart: true}, () => this.getSudokuBoard())
+    this.getSudokuBoard()
+  }
+  timeWhenFinished(time){
+    this.setState({time})
   }
   getSudokuBoard(){
      var sudokupuzzle = []
      var result = []
-    for(var i = 0; i < 100; i++){
+      for(var i = 0; i < 100; i++){
       sudokupuzzle = Sudoku.makepuzzle()
       result = Sudoku.solvepuzzle(sudokupuzzle)
       var difficulty = Sudoku.ratepuzzle(sudokupuzzle, 1)
-      console.log(difficulty)
+
       if(difficulty == 0){
           break 
       }
@@ -85,7 +94,6 @@ export default class sudokumap extends Component {
       sudoku[step] = items
       results[step] = resultitems
     }
-
     this.setState({sudoku, result:results, restart:false})
 
   }
@@ -98,21 +106,24 @@ export default class sudokumap extends Component {
   }
 
   input(value){
-
     if(this.state.selected != null){
-      if(this.state.sudoku[this.state.selected.i][this.state.selected.j].indexOf(value) == -1){
-        this.state.sudoku[this.state.selected.i][this.state.selected.j].push(value)
-        if(this.state.sudoku[this.state.selected.i][this.state.selected.j].indexOf(null) > -1){
-          this.state.sudoku[this.state.selected.i][this.state.selected.j].splice(this.state.sudoku[this.state.selected.i][this.state.selected.j].indexOf(null),1)
-        }
-      }else{
-          this.state.sudoku[this.state.selected.i][this.state.selected.j].splice(this.state.sudoku[this.state.selected.i][this.state.selected.j].indexOf(value),1)
+      if(value == "C"){
+        this.state.sudoku[this.state.selected.i][this.state.selected.j] = []
       }
-      if(this.state.sudoku[this.state.selected.i][this.state.selected.j].length == 0){
-        this.state.sudoku[this.state.selected.i][this.state.selected.j].push(null)
+      if(this.state.selected != null && value != "C"){
+        if(this.state.sudoku[this.state.selected.i][this.state.selected.j].indexOf(value) == -1){
+          this.state.sudoku[this.state.selected.i][this.state.selected.j].push(value)
+          if(this.state.sudoku[this.state.selected.i][this.state.selected.j].indexOf(null) > -1){
+            this.state.sudoku[this.state.selected.i][this.state.selected.j].splice(this.state.sudoku[this.state.selected.i][this.state.selected.j].indexOf(null),1)
+          }
+        }else{
+            this.state.sudoku[this.state.selected.i][this.state.selected.j].splice(this.state.sudoku[this.state.selected.i][this.state.selected.j].indexOf(value),1)
+        }
+        if(this.state.sudoku[this.state.selected.i][this.state.selected.j].length == 0){
+          this.state.sudoku[this.state.selected.i][this.state.selected.j].push(null)
+        }
       }
     }
-
     var done = []
     for(var i = 0;i < this.state.sudoku.length;i++){
       for(var j = 0; j < this.state.sudoku[i].length; j++){
@@ -121,13 +132,16 @@ export default class sudokumap extends Component {
         }
       }
     }
+
     if(done.length == 0){
-      console.log("Doneee")
-      this.setState()
+      this.setState({done:true})
     }
 
     if(this.arraysEqual(flatten(this.state.sudoku),flatten(this.state.result))){
       this.setState({solved:true})
+      var steps_message = 'It took you ' + this.state.steps + ' steps!'
+      var time_message = 'It took you ' + this.state.time + ' to complete this puzzle'
+      console.log(time_message)
       Alert.alert(
         'Solved!',
         'Succesfully solved the sudoku!',
@@ -136,18 +150,25 @@ export default class sudokumap extends Component {
         ],
         { cancelable: false }
       )
+      this.setState({sudoku:[]})
     }
 
-    this.setState({steps:this.state.steps++})
+    this.setState({steps:this.state.steps +1})
   }
 
   renderInput(){
-        var column = columns.map(column => {return <Input key={column} value={column} callback={this.input}/> })
-         return (
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop:height/20}}>
+        return inputs.map((input, i) => {
+          var column = inputcolumns.map((inputcolumn,j) => {
+            return <Input key={j + i} value={inputs} index={{i,j}} callback={this.input}/> 
+          })
+        
+           return (
+            <View key={i} style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom:height/75}}>
               {column}
              </View> 
-         )  }
+         ) 
+        })
+  }
          
   renderTile(){ 
         return columns.map((columnumber, i)=> {
@@ -161,33 +182,111 @@ export default class sudokumap extends Component {
          )
        })
   }
-  render() {
+
+   render() {
+     closeDrawer = () => {
+        this.drawer._root.close()
+      };
+      openDrawer = () => {
+       this.drawer._root.open()
+      };
+
     if(this.state.restart){
-      console.log("restaaaaarttt")
       {this.rerenderBoard()}
     }
 
+    if(this.state.sudoku.length == 0){
+      return(
+        <StyleProvider style={getTheme()}>
+      
+     <Drawer
+        ref={(ref) => { this.drawer = ref }}
+        content={<Sidebar/>}
+        tapToClose={true}
+        openDrawerOffset={0.2} // 20% gap on the right side of drawer
+        closedDrawerOffset={-3}
+        styles={drawerStyles}
+        panOpenMask={0.80}
+        captureGestures="open"
+        >
+         <Container>
+                <Header androidStatusBarColor={variables.statusBarColor}>
+                    <Left>
+                        <Button transparent onPress={() => openDrawer()}>
+                            <Icon name='menu' />
+                        </Button>
+                    </Left>
+                    <Body>
+                        <Title>Sudoku</Title>
+                    </Body>
+                    <Right>
+                    </Right>
+                </Header>
+        <View style={{justifyContent:'center', alignItems:'center'}}>  
+          <Spinner color='red'/>
+          <View>
+            <Text>Loading Sudoku</Text>
+          </View>
+        </View>   
+        </Container>
+        </Drawer>
+        </StyleProvider>  
+      )
+    }
     if(!this.state.restart){
     return (
-      <View style={{marginTop:height/75}}> 
+       <StyleProvider style={getTheme()}>
+      
+     <Drawer
+        ref={(ref) => { this.drawer = ref }}
+        content={<Sidebar/>}
+        tapToClose={true}
+        openDrawerOffset={0.2} // 20% gap on the right side of drawer
+        closedDrawerOffset={-3}
+        styles={drawerStyles}
+        panOpenMask={0.80}
+        captureGestures="open"
+        >
+
+          <Container>
+                <Header androidStatusBarColor={variables.statusBarColor}>
+                    <Left>
+                        <Button transparent onPress={() => openDrawer()}>
+                            <Icon name='menu' />
+                        </Button>
+                    </Left>
+                    <Body>
+                        <Title>Sudoku</Title>
+                    </Body>
+                    <Right>
+                    <Button transparent onPress={() => this.setState({sudoku:[]}, this.getSudokuBoard)}>
+                            <Icon name='md-refresh' />
+                        </Button>
+                    </Right>
+                </Header>
+           <View style={{marginTop:height/75}}> 
         <View style={{marginBottom:height/75, alignItems:'center'}}>
         <Text style={{fontSize:20}}><Timer solved={this.state.solved}/></Text>
         </View>
         <View>
         {this.renderTile()}
         </View>
-        <View>
+        <View style={{marginTop:height/75}}>
         {this.renderInput()}
         </View>
       </View>
+        </Container>
+      </Drawer>
+    </StyleProvider>
+     
     );
   }
-  else{
-    return (
-      <View></View>
-    )
   }
-  }
+}
+
+const drawerStyles = {
+  drawer: { shadowColor: '#000000', shadowOpacity: 0.8, shadowRadius: 3},
+  main: {paddingLeft: 3},
 }
 
 

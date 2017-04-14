@@ -1,4 +1,4 @@
-package com.sudoku;
+package com.briangorter.sudoku;
 
 import com.facebook.react.ReactActivity;
 
